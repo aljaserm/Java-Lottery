@@ -1,0 +1,214 @@
+package xproject1;
+import javax.swing.JOptionPane;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.text.DecimalFormat;
+import java.util.Random;
+
+public class xproject1
+{ 
+	public static void main(String[] args) throws IOException{
+		lottery pic=new lottery();
+		pic.payout   = new BufferedWriter(new FileWriter("C:\\Users\\Moast145\\Desktop\\alJaser_output.dat"));
+
+		for(int p = 0;p<=499;++p)      
+		{
+
+			pic.Get_player_numbers();
+			pic.Get_jackpot_number();
+			pic.Check_winner ();
+			pic.Assign_payout(); 
+			pic.Write_data();
+		}
+		pic.payout.close();
+		System.exit(0);	
+	}
+}
+class lottery
+{   static BufferedWriter payout;
+int[] picks= new int[5];
+int[] cpick=new int[5];
+int i,percentage;
+int j,c;
+int match=0;
+int jackpot=2500000;
+int win=0;
+int run=500;
+double []percent={0,0,0,0,0,0};
+int []cjackpot=new int[run+1];
+int cjackcount=0;
+int lcount=0;
+
+
+void Get_player_numbers ()
+
+{
+	String value,output;
+	int temp=0,numberflag=0,dupflag=0;
+	for(i=0;i<=4;++i)
+	{
+		
+		dupflag=0;
+		while(dupflag==0)
+		{
+			temp = (int)Math.round(Math.random()*98)+1;
+			dupflag=1;
+			for(c=0;c<=i;++c)
+			{
+				if(temp==picks[c])
+				{
+					dupflag=0;
+				}
+			}//inner for loop
+			if(dupflag==1)
+				picks[i]=temp;
+			else
+			{
+				
+				dupflag=0;
+			}
+		}//outer while flag loop
+		picks[i]=temp;
+	}//end of outer for loop
+}
+
+
+//void jackpot()
+void Get_jackpot_number()
+{
+
+	int ctemp,cdupflag=0;
+	for(j=0;j<=4;++j)
+	{
+		//YOU DO NOT NEED THE CNUMBERFLAG
+		//IF YOU GENERATED THE NUMBERS CORRECLTY, THE COMPUTER WILL NOT GENERATE ONE ABOVE 99 OR LESS THAN 1
+		cdupflag=0;
+		while(cdupflag==0)
+		{
+			ctemp = (int)Math.round(Math.random()*98)+1;
+			cdupflag=1;
+			for(c=0;c<=j;++c)
+			{
+				if(ctemp==cpick[c]||ctemp>=100)
+				{
+					cdupflag=0;
+				}
+			}//inner for loop
+			if(cdupflag==1)	
+				cpick[j]=ctemp;
+		}
+	}
+
+
+}
+
+
+void Check_winner ()
+{
+
+	for(int i=0;i<=4;++i)
+	{
+		for(int j=0;j<=4;++j)
+		{
+			if(picks[i]==cpick[j])
+			{
+				match=match+1;
+			}
+		}
+	}
+
+}
+
+void Assign_payout()
+{
+	switch(match)
+	{
+	case 0:
+		percent[match]++;
+		win=0;
+		jackpot=jackpot+25000;
+		break;
+	case 1:
+		percent[match]++;
+		win=100;
+		jackpot=jackpot+100000;
+
+		break;
+	case 2:
+		percent[match]++;
+		win=1000;
+		jackpot=jackpot+250000;
+
+		break;
+	case 3:
+		percent[match]++;
+		win=10000;
+		jackpot=jackpot+500000;
+
+		break;
+	case 4:
+		percent[match]++;
+		win=100000;
+		jackpot=jackpot+1000000;
+
+		break;
+	case 5:
+		percent[match]++;
+		win=jackpot;
+		jackpot=2500000;
+	}
+	cjackpot[++cjackcount]=jackpot;
+
+	
+}
+
+void Write_data () throws IOException
+{
+	if(cjackcount==1)
+	{
+	payout.write("Current Jackpot"+"\t\t\t\t"+"Player #"+"\t\t\t"+
+	"Winner #"+"\t\t\t"+"# Matched"+"\t\t"+"Payout ");
+	payout.newLine();
+	}
+	
+	
+	
+		payout.write(cjackpot[cjackcount]+"\t\t\t\t\t");
+		for(int pick:picks)
+			payout.write(pick+" ");
+		payout.write("\t\t\t");
+		
+		for(int pick:cpick)
+			payout.write(pick+" ");
+		payout.write("\t\t\t");
+		
+		payout.write(match+"\t\t\t");
+	match=0;
+	payout.write("$"+win);
+	payout.newLine();
+	DecimalFormat format=new DecimalFormat("#.00") ;
+	if(cjackcount==run)
+	{
+		payout.write(" The percent of plays where 0 numbers matched =  ");
+		payout.write(format.format((percent[0]/run)*100));
+		payout.newLine();
+		payout.write(" The percent of plays where 1 numbers matched =  ");
+		payout.write(format.format((percent[1]/run)*100));
+		payout.newLine();
+		payout.write(" The percent of plays where 2 numbers matched =  ");
+		payout.write(format.format((percent[2]/run)*100));
+		payout.newLine();
+		payout.write(" The percent of plays where 3 numbers matched =  ");
+		payout.write(format.format((percent[3]/run)*100));
+		payout.newLine();
+		payout.write(" The percent of plays where 4 numbers matched =  ");
+		payout.write(format.format((percent[4]/run)*100));
+		payout.newLine();
+		payout.write(" The percent of plays where ALL 5 numbers matched =  ");
+		payout.write(format.format((percent[5]/run)*100));
+		payout.newLine();
+	}
+
+}
+}//end of class lottery
